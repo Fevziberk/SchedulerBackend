@@ -2,38 +2,38 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function Page() {
-  const [courseName, setCourseName] = useState("");
+  const [courseData, setCourseData] = useState({courseName:"",courseHours:""});
+  
   function handleFormChange(event) {
-    const { value } = event.target;
-    setCourseName(value);
+    const { name, value } = event.target;
+    setCourseData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
   }
+  
   async function handleSubmit(e) {
-    
     e.preventDefault();
-    
-
+  
     try {
-      await axios.post("http://localhost:3000/", {
-        courseName
-    })
-      .then(res=>{
-        if (res.data === "exist") {
-          alert("Course exists");
-        } else if (res.data === "notexist") {
-          alert("No course has been found");
-        }else if(res.data ==="error"){
-          alert("database error");
-        }
-       
-      }).catch(e=>{
-        console.log(e);
-        alert("connection failed")
-        
-      })
-    } catch (event) {
-      console.log(e);
+      const response = await axios.post("http://localhost:3000/", courseData);
+      const { status, courseHours } = response.data;
+  
+      if (status === "exist") {
+        alert("Course exists");
+        alert(courseData.courseName + " "+courseHours);
+      } else if (status === "notexist") {
+        alert("No course has been found");
+      } else if (status === "error") {
+        alert("Database error");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Connection failed");
     }
   }
+  
+  
   
 
  
@@ -43,11 +43,11 @@ function Page() {
       <div className="input1Filed">
         <input
           type="text"
-          name="input1"
+          name="courseName"  // Add this line
           className="input1"
-          value={courseName}
+          value={courseData.courseName}
           onChange={handleFormChange}
-        />
+/>
       </div>
       <button className="save" onClick={handleSubmit}>
         Kaydet

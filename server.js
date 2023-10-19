@@ -10,20 +10,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/", async (req, res) => {
   console.log("Request received!");
-  const { courseName } = req.body;
+  const courseData = req.body;
+  const courseName = courseData.courseName;
+  const courseHours = courseData.courseHours;  // Extract courseHours from request
+  console.log(courseName, courseHours);
 
   try {
-    
     const course = await courses.findOne({ name: courseName });
     console.log(course);
     if (course) {
-      res.json("exist");
+      res.json({ status: "exist", courseHours: course.schedules });
     } else {
-      res.json("notexist");
+      res.json({ status: "notexist", courseHours: [] });
     }
   } catch (error) {
     console.error(error);
-    res.json("error");
+    res.json({ status: "error", courseHours: [] });
   }
 });
 
